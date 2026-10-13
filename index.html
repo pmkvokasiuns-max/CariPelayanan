@@ -27,6 +27,8 @@ textarea{resize:vertical;min-height:80px}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
 .tag{background:var(--ac2);color:var(--ac);font-size:12px;padding:2px 9px;border-radius:99px}
 .warn{color:var(--wn);font-size:12px}
+.tag{border:0;font:inherit;font-size:12px;cursor:pointer}.tag.on{background:var(--ac);color:#fff}
+.bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}.bar label{margin:0;white-space:nowrap}.bar select{width:auto;min-width:140px}
 .act{display:flex;gap:4px;align-items:center;flex:none}
 .wa{background:var(--wa);color:#fff;border-radius:10px;padding:9px 13px;text-decoration:none;font-weight:600;white-space:nowrap}
 .ic{border:0;background:none;cursor:pointer;color:var(--mu);font-size:16px;padding:6px}
@@ -42,16 +44,17 @@ textarea{resize:vertical;min-height:80px}
 </style></head><body><div class="w">
 <div class="top"><div><h1 id="ttl">🎸 Cari Pelayan</h1><div class="sub" id="cnt"></div><div class="sub" id="src"></div></div>
 <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="b" onclick="op('mT')">✉️ Template</button><button class="b" onclick="op('mI')">⬆️ Upload / Unduh data</button></div></div>
+<div class="bar"><label>Pengirim (M2):</label><select id="sd" onchange="setS(this.value)"></select></div>
 <input id="q" placeholder="Cari nama / prodi / gereja…" oninput="draw()">
 <div class="chips" id="chips"></div>
+<div class="sub" style="margin-top:-2px">Tips: klik tag pelayanan di kartu untuk memilih bentuk pelayanan yang dipakai di pesan.</div>
 <div id="list"><div class="empty">Memuat data…</div></div>
 </div>
 
 <div class="mod" id="mT"><div class="box"><h2>Template pesan WA</h2>
 <div class="sub">Tersimpan di perangkat ini saja.</div>
-<div class="g2"><div><label>Nama kamu</label><input id="tP"></div><div><label>Komunitas</label><input id="tK"></div>
-<div><label>Acara</label><input id="tA"></div><div><label>Hari</label><input id="tH"></div></div>
-<label>Jam</label><input id="tJ">
+<div class="g2"><div><label>Komunitas</label><input id="tK"></div><div><label>Acara</label><input id="tA"></div>
+<div><label>Hari</label><input id="tH"></div><div><label>Jam</label><input id="tJ"></div></div>
 <label>Isi template ({panggilan} {pelayanan} {pengirim} {komunitas} {acara} {hari} {jam})</label><textarea id="tB" style="min-height:170px"></textarea>
 <label>Contoh hasil</label><div class="pv" id="tV"></div>
 <div class="row"><button class="b" onclick="resetT()">Reset</button><button class="b" onclick="cl('mT')">Tutup</button><button class="b p" onclick="saveT()">Simpan</button></div></div></div>
@@ -63,12 +66,12 @@ textarea{resize:vertical;min-height:80px}
 <div class="row"><button class="b" onclick="dl('js')">⬇️ data.js</button><button class="b" onclick="dl('csv')">⬇️ CSV (untuk Sheets)</button><button class="b" onclick="cl('mI')">Tutup</button></div></div></div>
 
 <script>
-const CFG=Object.assign({SHEET_CSV_URL:'',JUDUL:'Cari Pelayan PMK',SENDER:'',KOMUNITAS:'',ACARA:'',HARI:'',JAM:''},window.CONFIG||{});
+const CFG=Object.assign({SHEET_CSV_URL:'',JUDUL:'Cari Pelayan PMK',SENDER:'',PENGIRIM:null,KOMUNITAS:'',ACARA:'',HARI:'',JAM:''},window.CONFIG||{});
 const DT='Shalom, {panggilan}! 😇🙏\nPerkenalkan, aku {pengirim} dari {komunitas}. Mau tanya nih, apakah {panggilan} berkenan untuk melayani sebagai {pelayanan} di {acara} besok, {hari}, pukul {jam}?\nKalau {panggilan} berkenan, nanti bisa kita koordinasikan lebih lanjut yaa. Terima kasih banyak sebelumnya, {panggilan}. Tuhan Yesus memberkati! ✨';
 const ORD=['WL','Singer','Gitaris','Bass','Drummer','Cajon','Keyboard','Biola','Tamborin','Pemusik','Multimedia','Usher & Kolekte','Sekolah Minggu','Dancer'];
 const KW=[['WL',/\bwl\b|worship leader|song leader|pemimpin pujian/],['Singer',/singer|vokal|vocal|penyanyi|paduan suara|choir/],['Gitaris',/gitar|guitar/],['Bass',/\bbas\b|\bbass/],['Drummer',/\bdrum/],['Cajon',/cajon|kajon/],['Keyboard',/keyboard|piano/],['Biola',/biola|violin/],['Tamborin',/tambou?rin/],['Multimedia',/multi ?media|mulmed|dokumentasi|streaming|camera|video|visual jockey/],['Usher & Kolekte',/usher|kolek|persembahan/],['Sekolah Minggu',/sekolah minggu|\bsm\b|komisi anak|eagle kids/],['Dancer',/danc|penari|flag|banner|gerak/]];
 const INST=['Gitaris','Bass','Drummer','Cajon','Keyboard','Biola','Tamborin'];
-const PH={WL:'worship leader',Singer:'singer',Gitaris:'gitaris',Bass:'bassist',Drummer:'drummer',Cajon:'pemain cajon',Keyboard:'pemain keyboard',Biola:'pemain biola',Tamborin:'pemain tamborin',Pemusik:'pemusik',Multimedia:'tim multimedia','Usher & Kolekte':'usher','Sekolah Minggu':'pelayan sekolah minggu',Dancer:'dancer'};
+const PH={WL:'worship leader',Singer:'singer',Gitaris:'pemain gitar',Bass:'pemain bass',Drummer:'pemain drum',Cajon:'pemain cajon',Keyboard:'pemain keyboard',Biola:'pemain biola',Tamborin:'pemain tamborin',Pemusik:'pemusik',Multimedia:'tim multimedia','Usher & Kolekte':'usher','Sekolah Minggu':'pelayan sekolah minggu',Dancer:'dancer'};
 const $=id=>document.getElementById(id);
 const DTPL={p:CFG.SENDER,k:CFG.KOMUNITAS,a:CFG.ACARA,h:CFG.HARI,j:CFG.JAM,b:DT};
 let P=[],T={...DTPL},sel='Semua';
@@ -88,7 +91,10 @@ function merge(list){P=[];
   if(m){m.r=sortR([...m.r,...o.r]);['pn','pr','gr'].forEach(k=>{if(o[k])m[k]=o[k]});if(o.v||(!m.v&&(o.w||o.q))){m.w=o.w;m.v=o.v;m.q=o.q}}
   else P.push(o)})}
 const firstP=p=>p.pn||p.n.split(' ')[0];
-function msg(p,role){const r=role&&role!=='Semua'&&p.r.includes(role)?role:p.r[0];
+let pick={};
+function cur(p,role){return pick[p.id]&&p.r.includes(pick[p.id])?pick[p.id]:(role&&role!=='Semua'&&p.r.includes(role)?role:p.r[0])}
+function pk(id,i){const p=P.find(x=>x.id===id);pick[id]=p.r[i];draw()}
+function msg(p,role){const r=cur(p,role);
  const m={panggilan:firstP(p),pelayanan:r?(PH[r]||r.toLowerCase()):'pelayan',pengirim:T.p,komunitas:T.k,acara:T.a,hari:T.h,jam:T.j};
  return T.b.replace(/\{(\w+)\}/g,(x,k)=>m[k]??x)}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -98,7 +104,7 @@ function draw(){
  const rs=Object.entries(m).sort((a,b)=>{const x=ORD.indexOf(a[0]),y=ORD.indexOf(b[0]);return(x<0?99:x)-(y<0?99:y)});
  if(sel!=='Semua'&&!m[sel])sel='Semua';
  $('chips').innerHTML=[['Semua',P.length],...rs].map(([r,c])=>`<button class="chip ${r===sel?'on':''}" data-r="${esc(r)}">${esc(r)}<small>${c}</small></button>`).join('');
- document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{sel=b.dataset.r;draw()});
+ document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{sel=b.dataset.r;pick={};draw()});
  const L=P.filter(p=>(sel==='Semua'||p.r.includes(sel))&&(!q||(p.n+' '+p.pr+' '+p.gr).toLowerCase().includes(q))).sort((a,b)=>a.n.localeCompare(b.n));
  $('cnt').textContent=L.length+' dari '+P.length+' orang';
  $('list').innerHTML=L.length?L.map(p=>{
@@ -107,15 +113,16 @@ function draw(){
   else if(p.q)btn=`<a class="wa" target="_blank" rel="noopener" href="${esc(p.q)}">💬 Link WA</a>`;
   else btn='<span class="warn">tanpa nomor</span>';
   const note=p.q&&!p.w?'<div class="warn">Link QR (pesan tidak terisi otomatis) – pakai 📋</div>':(!p.v&&p.w?'<div class="warn">⚠ cek nomor</div>':'');
-  return `<div class="card"><div><div class="nm">${esc(p.n)}</div><div class="in">${esc([p.pr,p.gr].filter(Boolean).join(' · '))}</div><div class="tags">${p.r.map(r=>`<span class="tag">${esc(r)}</span>`).join('')}</div>${note}</div><div class="act">${btn}<button class="ic" title="Salin pesan" onclick="cp('${p.id}')">📋</button></div></div>`}).join(''):'<div class="empty">Tidak ada hasil.</div>'}
+  return `<div class="card"><div><div class="nm">${esc(p.n)}</div><div class="in">${esc([p.pr,p.gr].filter(Boolean).join(' · '))}</div><div class="tags">${p.r.map((r,i)=>`<button class="tag ${r===cur(p,sel)?'on':''}" onclick="pk('${p.id}',${i})">${esc(r)}</button>`).join('')}</div>${note}</div><div class="act">${btn}<button class="ic" title="Salin pesan" onclick="cp('${p.id}')">📋</button></div></div>`}).join(''):'<div class="empty">Tidak ada hasil.</div>'}
 function cp(id){const t=msg(P.find(x=>x.id===id),sel);if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert('Pesan disalin'),()=>prompt('Salin pesan:',t));else prompt('Salin pesan:',t)}
-function op(id){if(id==='mT'){tP.value=T.p;tK.value=T.k;tA.value=T.a;tH.value=T.h;tJ.value=T.j;tB.value=T.b;pv()}$(id).classList.add('o')}
+function op(id){if(id==='mT'){tK.value=T.k;tA.value=T.a;tH.value=T.h;tJ.value=T.j;tB.value=T.b;pv()}$(id).classList.add('o')}
 function cl(id){$(id).classList.remove('o')}
-function readT(){return{p:tP.value,k:tK.value,a:tA.value,h:tH.value,j:tJ.value,b:tB.value}}
+function readT(){return{p:T.p,k:tK.value,a:tA.value,h:tH.value,j:tJ.value,b:tB.value}}
 function pv(){const o=T;T=readT();$('tV').textContent=msg(P.find(x=>x.r.length)||{n:'Andreas',r:['Cajon']},'');T=o}
-['tP','tK','tA','tH','tJ','tB'].forEach(i=>$(i).addEventListener('input',pv));
+['tK','tA','tH','tJ','tB'].forEach(i=>$(i).addEventListener('input',pv));
+function setS(v){T.p=v;try{localStorage.setItem('plv_s',v)}catch(e){}draw()}
 function saveT(){T=readT();try{localStorage.setItem('plv_t',JSON.stringify(T))}catch(e){}cl('mT');draw()}
-function resetT(){T={...DTPL};try{localStorage.removeItem('plv_t')}catch(e){}op('mT');draw()}
+function resetT(){T={...DTPL,p:$('sd').value};try{localStorage.removeItem('plv_t')}catch(e){}op('mT');draw()}
 function parseTxt(t){t=t.replace(/^\ufeff/,'');const d=(t.split('\n')[0]||'').includes('\t')?'\t':',';const rows=[];let r=[],c='',q=false;
  for(let i=0;i<t.length;i++){const ch=t[i];
   if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
@@ -143,6 +150,10 @@ function dl(kind){let txt,name,type;
 async function init(){
  $('ttl').textContent='🎸 '+CFG.JUDUL;document.title=CFG.JUDUL;
  try{Object.assign(T,JSON.parse(localStorage.getItem('plv_t')||'{}'))}catch(e){}
+ const L=Array.isArray(CFG.PENGIRIM)&&CFG.PENGIRIM.length?CFG.PENGIRIM:['Angelo','Mashudi','Tasya','Meyli','Gaby'];
+ let sv0=null;try{sv0=localStorage.getItem('plv_s')}catch(e){}
+ T.p=L.includes(sv0)?sv0:(L.includes(CFG.SENDER)?CFG.SENDER:L[0]);
+ $('sd').innerHTML=L.map(n=>`<option${n===T.p?' selected':''}>${esc(n)}</option>`).join('');
  const u=cfgUrl();let ok=false;
  if(u){try{const r=await fetch(u+(u.includes('?')?'&':'?')+'t='+Date.now());if(!r.ok)throw 0;const rows=parseTxt(await r.text());const N=fromRows(rows);if(N.length){merge(N);$('src').textContent='Sumber: Google Sheets';ok=true}}catch(e){}}
  if(!ok){merge((window.DATA||[]).map(r=>mk(r[0],r[1],r[2],r[3],det(r[4]+' '+r[5]),r[6])));$('src').textContent=u?'Gagal mengambil Google Sheets – memakai data cadangan (data.js)':'Sumber: data.js'}
