@@ -6,7 +6,7 @@ Isi folder ini (semuanya statis, tanpa server, tanpa install apa pun):
 |---|---|
 | `index.html` | Aplikasinya (tidak perlu diedit) |
 | `config.js` | Pengaturan: nama pengirim, acara, hari, jam, dan link Google Sheets |
-| `data.js` | Database cadangan (125 baris dari file Excel kamu) |
+| `data.js` | Database cadangan (data 3 angkatan: 2024, 2025, 2026) |
 
 Cek lokal: klik dua kali `index.html` – langsung jalan.
 
@@ -32,7 +32,8 @@ Bagikan link website-nya ke teman-teman. Mereka tinggal buka, tidak perlu upload
 
 **Cara 1 – Google Sheets (paling praktis, teman-teman otomatis dapat data terbaru)**
 1. Di Google Sheets buat tab baru berisi **hanya** kolom ini (baris pertama judul):
-   `Nama | Panggilan | Prodi | Gereja | Pelayanan | WA`
+   `Nama | Panggilan | Prodi | Angkatan | Kampus | Gereja | Pelayanan | WA`
+   (Angkatan = tahun, mis. 2026. Kampus = Solo atau Madiun; orang Madiun akan diberi label oranye di kartunya.)
    (Boleh juga memakai judul kolom persis seperti Google Form: Nama Lengkap, PROGRAM STUDI, Nomor WA, Asal Gereja, Pengalaman Pelayanan di Gereja, Alat Musik Yang Bisa Dimainkan.)
    Tips: buka aplikasi → *Upload / Unduh data* → *CSV (untuk Sheets)* untuk dapat file awal yang rapi, lalu impor ke Sheets.
 2. *File → Bagikan → Publikasikan ke web* → pilih **tab itu saja** → format **CSV** → *Publikasikan* → salin link.
@@ -51,3 +52,6 @@ Bagikan link website-nya ke teman-teman. Mereka tinggal buka, tidak perlu upload
 - Kolom `Panggilan` (opsional) dipakai untuk sapaan di pesan; kalau kosong dipakai nama depan.
 - Kategori (Singer, Gitaris, Cajon, WL, dll.) dibaca otomatis dari kolom Pelayanan / Alat Musik.
 - Template pesan bisa diubah tiap orang lewat tombol ✉️ Template (tersimpan di perangkat masing-masing). Nilai bawaan diatur di `config.js`.
+
+- **Angkatan** dibaca dari kolom Angkatan, atau dari tahun di kolom Timestamp, atau dari tahun di nama file yang diupload.
+- **Kampus Madiun** dikenali dari tulisan "Madiun" atau "PSDKU" di kolom Prodi, atau kolom Kampus berisi Madiun.

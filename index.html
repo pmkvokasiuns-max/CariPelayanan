@@ -28,7 +28,8 @@ textarea{resize:vertical;min-height:80px}
 .tag{background:var(--ac2);color:var(--ac);font-size:12px;padding:2px 9px;border-radius:99px}
 .warn{color:var(--wn);font-size:12px}
 .tag{border:0;font:inherit;font-size:12px;cursor:pointer}.tag.on{background:var(--ac);color:#fff}
-.bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}.bar label{margin:0;white-space:nowrap}.bar select{width:auto;min-width:140px}
+.bdg{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:99px;margin-left:6px;vertical-align:1px;background:var(--bg);border:1px solid var(--br);color:var(--mu)}.bdg.md{background:#fde8c8;border-color:#f0b765;color:#8a4b00}
+.bar{flex-wrap:wrap;display:flex;align-items:center;gap:8px;margin-bottom:10px}.bar label{margin:0;white-space:nowrap}.bar select{width:auto;min-width:140px}
 .act{display:flex;gap:4px;align-items:center;flex:none}
 .wa{background:var(--wa);color:#fff;border-radius:10px;padding:9px 13px;text-decoration:none;font-weight:600;white-space:nowrap}
 .ic{border:0;background:none;cursor:pointer;color:var(--mu);font-size:16px;padding:6px}
@@ -45,6 +46,7 @@ textarea{resize:vertical;min-height:80px}
 <div class="top"><div><h1 id="ttl">🎸 Cari Pelayan</h1><div class="sub" id="cnt"></div><div class="sub" id="src"></div></div>
 <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="b" onclick="op('mT')">✉️ Template</button><button class="b" onclick="op('mI')">⬆️ Upload / Unduh data</button></div></div>
 <div class="bar"><label>Pengirim (M2):</label><select id="sd" onchange="setS(this.value)"></select></div>
+<div class="bar"><label>Angkatan:</label><select id="fa" onchange="fA=this.value;draw()"></select><label>Kampus:</label><select id="fk" onchange="fK=this.value;draw()"></select></div>
 <input id="q" placeholder="Cari nama / prodi / gereja…" oninput="draw()">
 <div class="chips" id="chips"></div>
 <div class="sub" style="margin-top:-2px">Tips: klik tag pelayanan di kartu untuk memilih bentuk pelayanan yang dipakai di pesan.</div>
@@ -60,8 +62,8 @@ textarea{resize:vertical;min-height:80px}
 <div class="row"><button class="b" onclick="resetT()">Reset</button><button class="b" onclick="cl('mT')">Tutup</button><button class="b p" onclick="saveT()">Simpan</button></div></div></div>
 
 <div class="mod" id="mI"><div class="box"><h2>Upload / Unduh data</h2>
-<div class="sub">Upload file <b>.xlsx</b>/<b>.csv</b> untuk <b>pratinjau</b> (hanya di perangkat ini, tidak mengubah data teman-teman). Untuk update permanen, unduh <b>data.js</b> lalu timpa file di folder website, atau update Google Sheets.</div>
-<label>Pilih file</label><input type="file" id="iF" accept=".xlsx,.xls,.csv,.txt,.tsv">
+<div class="sub">Upload file <b>.xlsx</b>/<b>.csv</b> (boleh pilih beberapa file sekaligus, mis. 3 angkatan) untuk <b>pratinjau</b> (hanya di perangkat ini, tidak mengubah data teman-teman). Untuk update permanen, unduh <b>data.js</b> lalu timpa file di folder website, atau update Google Sheets.</div>
+<label>Pilih file</label><input type="file" id="iF" multiple accept=".xlsx,.xls,.csv,.txt,.tsv">
 <div class="msg" id="iX"></div>
 <div class="row"><button class="b" onclick="dl('js')">⬇️ data.js</button><button class="b" onclick="dl('csv')">⬇️ CSV (untuk Sheets)</button><button class="b" onclick="cl('mI')">Tutup</button></div></div></div>
 
@@ -80,18 +82,24 @@ const uid=()=>Math.random().toString(36).slice(2,9);
 function det(t){t=cs(t).toLowerCase();const r=KW.filter(k=>k[1].test(t)).map(k=>k[0]);if(!r.some(x=>INST.includes(x))&&/musik/.test(t))r.push('Pemusik');return sortR(r)}
 function sortR(r){return[...new Set(r)].sort((a,b)=>{const x=ORD.indexOf(a),y=ORD.indexOf(b);return(x<0?99:x)-(y<0?99:y)})}
 function tc(n){return(n===n.toUpperCase()||n===n.toLowerCase())?n.toLowerCase().replace(/(^|[\s.\-])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase()):n}
-function wa(raw){const s=cs(raw);if(!s)return{w:'',v:false};
+function wa(raw){let s=cs(raw);if(!s)return{w:'',v:false};
+ if(!/wa\.me/i.test(s)){const ps=s.split(/[\/,;]|\bdan\b/i).filter(x=>x.replace(/\D/g,'').length>=9);if(ps.length>1)s=ps.find(x=>/\bwa\b/i.test(x))||ps[0]}
  if(/wa\.me\/qr\//i.test(s)){const u=s.match(/(?:https?:\/\/)?wa\.me\/qr\/\S+/i)[0];return{w:'',v:false,q:/^http/i.test(u)?u:'https://'+u}}
  let d=s.replace(/\.0$/,'').replace(/\D/g,'');
  if(d.startsWith('620'))d='62'+d.slice(3);else if(d.startsWith('0'))d='62'+d.slice(1);else if(d.startsWith('8'))d='62'+d;
  return{w:d,v:/^62\d{9,13}$/.test(d)}}
-function mk(n,pr,w,gr,roles,pn){const x=wa(w);return{id:uid(),n:tc(cs(n)),pn:cs(pn),pr:cs(pr),gr:cs(gr),r:roles,w:x.w,v:x.v,q:x.q||''}}
+function mk(n,pr,w,gr,roles,pn,ang,kp){const x=wa(w);const md=/madiun|psdku/i.test(cs(pr)+' '+cs(kp));
+ const p2=tc(cs(String(pr||'').replace(/\s*\([^)]*(madiun|psdku)[^)]*\)/i,'').replace(/\s*\b(psdku|madiun)\b/gi,'')));
+ return{id:uid(),n:tc(cs(n)),pn:cs(pn),pr:p2,gr:cs(gr),r:roles,w:x.w,v:x.v,q:x.q||'',a:cs(ang),md}}
 function merge(list){P=[];
- list.forEach(o=>{const m=P.find(p=>p.n.toLowerCase()===o.n.toLowerCase());
-  if(m){m.r=sortR([...m.r,...o.r]);['pn','pr','gr'].forEach(k=>{if(o[k])m[k]=o[k]});if(o.v||(!m.v&&(o.w||o.q))){m.w=o.w;m.v=o.v;m.q=o.q}}
+ list.forEach(o=>{const m=P.find(p=>p.n.toLowerCase()===o.n.toLowerCase()&&p.a===o.a);
+  if(m){if(o.md)m.md=true;m.r=sortR([...m.r,...o.r]);['pn','pr','gr'].forEach(k=>{if(o[k])m[k]=o[k]});if(o.v||(!m.v&&(o.w||o.q))){m.w=o.w;m.v=o.v;m.q=o.q}}
   else P.push(o)})}
 const firstP=p=>p.pn||p.n.split(' ')[0];
-let pick={};
+let pick={},fA='',fK='';
+function filtUI(){const ys=[...new Set(P.map(p=>p.a).filter(Boolean))].sort().reverse();
+ $('fa').innerHTML='<option value="">Semua</option>'+ys.map(y=>`<option${y===fA?' selected':''}>${esc(y)}</option>`).join('');
+ $('fk').innerHTML=[['','Semua'],['solo','Solo'],['madiun','Madiun']].map(([v,t])=>`<option value="${v}"${v===fK?' selected':''}>${t}</option>`).join('')}
 function cur(p,role){return pick[p.id]&&p.r.includes(pick[p.id])?pick[p.id]:(role&&role!=='Semua'&&p.r.includes(role)?role:p.r[0])}
 function pk(id,i){const p=P.find(x=>x.id===id);pick[id]=p.r[i];draw()}
 function msg(p,role){const r=cur(p,role);
@@ -100,12 +108,13 @@ function msg(p,role){const r=cur(p,role);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function draw(){
  const q=$('q').value.toLowerCase().trim(),m={};
- P.forEach(p=>p.r.forEach(r=>m[r]=(m[r]||0)+1));
+ const base=P.filter(p=>(!fA||p.a===fA)&&(!fK||(fK==='madiun'?p.md:!p.md)));
+ base.forEach(p=>p.r.forEach(r=>m[r]=(m[r]||0)+1));
  const rs=Object.entries(m).sort((a,b)=>{const x=ORD.indexOf(a[0]),y=ORD.indexOf(b[0]);return(x<0?99:x)-(y<0?99:y)});
  if(sel!=='Semua'&&!m[sel])sel='Semua';
- $('chips').innerHTML=[['Semua',P.length],...rs].map(([r,c])=>`<button class="chip ${r===sel?'on':''}" data-r="${esc(r)}">${esc(r)}<small>${c}</small></button>`).join('');
+ $('chips').innerHTML=[['Semua',base.length],...rs].map(([r,c])=>`<button class="chip ${r===sel?'on':''}" data-r="${esc(r)}">${esc(r)}<small>${c}</small></button>`).join('');
  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{sel=b.dataset.r;pick={};draw()});
- const L=P.filter(p=>(sel==='Semua'||p.r.includes(sel))&&(!q||(p.n+' '+p.pr+' '+p.gr).toLowerCase().includes(q))).sort((a,b)=>a.n.localeCompare(b.n));
+ const L=base.filter(p=>(sel==='Semua'||p.r.includes(sel))&&(!q||(p.n+' '+p.pr+' '+p.gr).toLowerCase().includes(q))).sort((a,b)=>a.n.localeCompare(b.n));
  $('cnt').textContent=L.length+' dari '+P.length+' orang';
  $('list').innerHTML=L.length?L.map(p=>{
   const t=encodeURIComponent(msg(p,sel));let btn='';
@@ -113,7 +122,7 @@ function draw(){
   else if(p.q)btn=`<a class="wa" target="_blank" rel="noopener" href="${esc(p.q)}">💬 Link WA</a>`;
   else btn='<span class="warn">tanpa nomor</span>';
   const note=p.q&&!p.w?'<div class="warn">Link QR (pesan tidak terisi otomatis) – pakai 📋</div>':(!p.v&&p.w?'<div class="warn">⚠ cek nomor</div>':'');
-  return `<div class="card"><div><div class="nm">${esc(p.n)}</div><div class="in">${esc([p.pr,p.gr].filter(Boolean).join(' · '))}</div><div class="tags">${p.r.map((r,i)=>`<button class="tag ${r===cur(p,sel)?'on':''}" onclick="pk('${p.id}',${i})">${esc(r)}</button>`).join('')}</div>${note}</div><div class="act">${btn}<button class="ic" title="Salin pesan" onclick="cp('${p.id}')">📋</button></div></div>`}).join(''):'<div class="empty">Tidak ada hasil.</div>'}
+  return `<div class="card"><div><div class="nm">${esc(p.n)}${p.a?`<span class="bdg">Angkatan ${esc(p.a)}</span>`:''}${p.md?'<span class="bdg md">📍 Kampus Madiun</span>':''}</div><div class="in">${esc([p.pr,p.gr].filter(Boolean).join(' · '))}</div><div class="tags">${p.r.map((r,i)=>`<button class="tag ${r===cur(p,sel)?'on':''}" onclick="pk('${p.id}',${i})">${esc(r)}</button>`).join('')}</div>${note}</div><div class="act">${btn}<button class="ic" title="Salin pesan" onclick="cp('${p.id}')">📋</button></div></div>`}).join(''):'<div class="empty">Tidak ada hasil.</div>'}
 function cp(id){const t=msg(P.find(x=>x.id===id),sel);if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert('Pesan disalin'),()=>prompt('Salin pesan:',t));else prompt('Salin pesan:',t)}
 function op(id){if(id==='mT'){tK.value=T.k;tA.value=T.a;tH.value=T.h;tJ.value=T.j;tB.value=T.b;pv()}$(id).classList.add('o')}
 function cl(id){$(id).classList.remove('o')}
@@ -130,22 +139,26 @@ function parseTxt(t){t=t.replace(/^\ufeff/,'');const d=(t.split('\n')[0]||'').in
   else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';if(r.some(x=>x.trim()))rows.push(r);r=[]}
   else c+=ch}
  r.push(c);if(r.some(x=>x.trim()))rows.push(r);return rows}
-function fromRows(rows){
+function fromRows(rows,defY){
  const H=(rows[0]||[]).map(x=>cs(x).toLowerCase()),c={};
- const tests=[['alat',/alat|instrumen/],['exp',/pengalaman|pelayanan|posisi|role|peran/],['gr',/gereja/],['pr',/prodi|program studi|jurusan/],['wa',/\bwa\b|whatsapp|\bhp\b|telp|nomor/],['pn',/panggilan/],['n',/nama/]];
+ const tests=[['ang',/angkatan/],['kp',/kampus/],['ts',/timestamp|cap waktu/],['alat',/alat|instrumen/],['exp',/pengalaman|pelayanan|posisi|role|peran/],['gr',/gereja/],['pr',/prodi|program studi|jurusan/],['wa',/\bwa\b|whatsapp|\bhp\b|telp|nomor/],['pn',/panggilan/],['n',/nama/]];
  H.forEach((h,i)=>{for(const[k,re]of tests){if(c[k]===undefined&&re.test(h)){c[k]=i;break}}});
  let s=1;if(c.n===undefined){Object.assign(c,{n:0,exp:1,wa:2});s=0}
  const g=(r,k)=>c[k]===undefined?'':r[c[k]];
- return rows.slice(s).filter(r=>cs(g(r,'n'))).map(r=>mk(g(r,'n'),g(r,'pr'),g(r,'wa'),g(r,'gr'),det(g(r,'exp')+' '+g(r,'alat')),g(r,'pn')))}
-$('iF').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
- const done=rows=>{const N=fromRows(rows);if(!N.length){$('iX').textContent='Tidak ada baris valid.';return}merge(N);$('src').textContent='Sumber: file upload (pratinjau, hanya di perangkat ini)';draw();$('iX').textContent=N.length+' baris dimuat → '+P.length+' orang. Sekarang bisa unduh data.js / CSV.'};
- if(/\.(xlsx|xls)$/i.test(f.name)){
-  if(typeof XLSX==='undefined'){$('iX').textContent='Pembaca Excel belum termuat (butuh internet). Simpan sebagai CSV lalu upload ulang.';return}
-  rd.onload=()=>{try{const wb=XLSX.read(rd.result,{type:'array'});done(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false}))}catch(err){$('iX').textContent='Gagal membaca file.'}};rd.readAsArrayBuffer(f)}
- else{rd.onload=()=>done(parseTxt(rd.result));rd.readAsText(f)}};
+ const yr=r=>{const a=cs(g(r,'ang'));if(a)return(a.match(/20\d\d/)||[a])[0];const m=String(g(r,'ts')).match(/20\d\d/);return m?m[0]:(defY||'')};
+ return rows.slice(s).filter(r=>cs(g(r,'n'))).map(r=>mk(g(r,'n'),g(r,'pr'),g(r,'wa'),g(r,'gr'),det(g(r,'exp')+' '+g(r,'alat')),g(r,'pn'),yr(r),g(r,'kp')))}
+$('iF').onchange=async e=>{const fs=[...e.target.files];if(!fs.length)return;let all=[];
+ for(const f of fs){try{let rows;
+  if(/\.(xlsx|xls)$/i.test(f.name)){if(typeof XLSX==='undefined'){$('iX').textContent='Pembaca Excel belum termuat (butuh internet). Simpan sebagai CSV lalu upload ulang.';return}
+   const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''})}
+  else rows=parseTxt(await f.text());
+  all=all.concat(fromRows(rows,(f.name.match(/20\d\d/)||[''])[0]))}catch(err){$('iX').textContent='Gagal membaca '+f.name;return}}
+ if(!all.length){$('iX').textContent='Tidak ada baris valid.';return}
+ merge(all);filtUI();$('src').textContent='Sumber: file upload (pratinjau, hanya di perangkat ini)';draw();$('iX').textContent=fs.length+' file, '+all.length+' baris → '+P.length+' orang. Sekarang bisa unduh data.js / CSV.'};
+const prX=p=>p.pr+(p.md?' (PSDKU Madiun)':'');
 function dl(kind){let txt,name,type;
- if(kind==='js'){txt='// Database cadangan. Format tiap baris: [Nama, Prodi, WA, Gereja, Pelayanan, Alat Musik, Panggilan]\nwindow.DATA = [\n'+P.map(p=>JSON.stringify([p.n,p.pr,p.w||p.q,p.gr,p.r.join(', '),'',p.pn])).join(',\n')+'\n];\n';name='data.js';type='text/javascript'}
- else{const q=s=>'"'+String(s).replace(/"/g,'""')+'"';txt='\ufeffNama,Panggilan,Prodi,Gereja,Pelayanan,WA\n'+P.map(p=>[p.n,p.pn,p.pr,p.gr,p.r.join(', '),p.w||p.q].map(q).join(',')).join('\n');name='database-pelayan.csv';type='text/csv'}
+ if(kind==='js'){txt='// Database cadangan. Format tiap baris: [Nama, Prodi, WA, Gereja, Pelayanan, Alat Musik, Panggilan, Angkatan]\nwindow.DATA = [\n'+P.map(p=>JSON.stringify([p.n,prX(p),p.w||p.q,p.gr,p.r.join(', '),'',p.pn,p.a])).join(',\n')+'\n];\n';name='data.js';type='text/javascript'}
+ else{const q=s=>'"'+String(s).replace(/"/g,'""')+'"';txt='\ufeffNama,Panggilan,Prodi,Angkatan,Kampus,Gereja,Pelayanan,WA\n'+P.map(p=>[p.n,p.pn,p.pr,p.a,p.md?'Madiun':'Solo',p.gr,p.r.join(', '),p.w||p.q].map(q).join(',')).join('\n');name='database-pelayan.csv';type='text/csv'}
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click()}
 async function init(){
  $('ttl').textContent='🎸 '+CFG.JUDUL;document.title=CFG.JUDUL;
@@ -156,8 +169,8 @@ async function init(){
  $('sd').innerHTML=L.map(n=>`<option${n===T.p?' selected':''}>${esc(n)}</option>`).join('');
  const u=cfgUrl();let ok=false;
  if(u){try{const r=await fetch(u+(u.includes('?')?'&':'?')+'t='+Date.now());if(!r.ok)throw 0;const rows=parseTxt(await r.text());const N=fromRows(rows);if(N.length){merge(N);$('src').textContent='Sumber: Google Sheets';ok=true}}catch(e){}}
- if(!ok){merge((window.DATA||[]).map(r=>mk(r[0],r[1],r[2],r[3],det(r[4]+' '+r[5]),r[6])));$('src').textContent=u?'Gagal mengambil Google Sheets – memakai data cadangan (data.js)':'Sumber: data.js'}
- draw()}
+ if(!ok){merge((window.DATA||[]).map(r=>mk(r[0],r[1],r[2],r[3],det(r[4]+' '+r[5]),r[6],r[7])));$('src').textContent=u?'Gagal mengambil Google Sheets – memakai data cadangan (data.js)':'Sumber: data.js'}
+ filtUI();draw()}
 function cfgUrl(){return cs(CFG.SHEET_CSV_URL)}
 init();
 </script></body></html>
