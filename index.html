@@ -2,56 +2,117 @@
 <html lang="id"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#17143a">
 <title>Cari Pelayan PMK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="config.js"></script>
 <script src="data.js"></script>
 <style>
-:root{--bg:#f6f5f1;--card:#fff;--tx:#1f2430;--mu:#6b7280;--br:#e5e3dc;--ac:#2f6f5e;--ac2:#e8f2ef;--wa:#25a244;--wn:#b45309}
-@media(prefers-color-scheme:dark){:root{--bg:#15181d;--card:#1f242b;--tx:#eceef1;--mu:#9aa3af;--br:#2f3640;--ac:#5fc0a5;--ac2:#1d3a33;--wn:#fbbf24}}
+:root{--paper:#f4f3fa;--surface:#fff;--ink:#17143a;--mu:#6a6890;--line:#e3e1f1;--ac:#4f3fe6;--ac-soft:#ebe8ff;--hero:#17143a;--wa:#1c9a52;--wa-h:#157c42;--amb:#f5a524;--amb-soft:#fff3d9;--amb-ink:#6f4300;--wn:#b45309;--sh:0 1px 2px rgba(23,20,58,.06),0 6px 18px -8px rgba(23,20,58,.18)}
+@media(prefers-color-scheme:dark){:root{--paper:#0e0d22;--surface:#1a1838;--ink:#eeedff;--mu:#9d9bc6;--line:#2c2a58;--ac:#9285ff;--ac-soft:#2b2766;--hero:#1a1838;--wa:#25b062;--wa-h:#1e9a54;--amb-soft:#3b2a09;--amb-ink:#ffd58a;--wn:#fbbf24;--sh:none}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-.w{max-width:780px;margin:0 auto;padding:16px}
-h1{font-size:20px;margin:0}.sub{color:var(--mu);font-size:13px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-button,input,textarea,select{font:inherit;color:var(--tx)}
-.b{border:1px solid var(--br);background:var(--card);padding:8px 12px;border-radius:10px;cursor:pointer}
-.b.p{background:var(--ac);color:#fff;border-color:var(--ac)}
-input,textarea,select{width:100%;padding:10px 12px;border:1px solid var(--br);border-radius:10px;background:var(--card)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.hero{background:var(--hero);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 16px 22px}
+.in{max-width:1040px;margin:0 auto}
+.hrow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:clamp(26px,5vw,36px);line-height:1.1;font-weight:800;letter-spacing:-.025em}
+.lead{margin:6px 0 0;color:#c9c6ee;font-size:14px}.lead b{color:#fff;font-size:15px}
+.hb{border:1px solid #ffffff40;background:#ffffff14;color:#fff;padding:8px 14px;border-radius:99px;cursor:pointer;font-weight:600;font-size:13px;transition:background .15s}
+.hb:hover{background:#ffffff2a}
+.hbtn{display:flex;gap:8px;flex-wrap:wrap}
+.send{margin-top:18px;display:flex;align-items:center;gap:10px;background:#ffffff12;border:1px solid #ffffff26;border-radius:16px;padding:10px 12px;max-width:430px}
+.send span{font-size:13px;color:#d6d3f5;white-space:nowrap}
+.send select{flex:1;background-color:#fff;color:#17143a;border:0;font-weight:700;border-radius:10px}
+main{max-width:1040px;margin:0 auto;padding:16px}
+select{appearance:none;-webkit-appearance:none;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%236a6890' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 12px center;border:1px solid var(--line);border-radius:12px;padding:9px 34px 9px 12px;cursor:pointer;min-width:0}
+input,textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
 textarea{resize:vertical;min-height:80px}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-.chip{flex:none;border:1px solid var(--br);background:var(--card);padding:7px 14px;border-radius:99px;cursor:pointer;white-space:nowrap}
-.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}.chip small{opacity:.7;margin-left:4px}
-.card{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:12px 14px;margin-bottom:10px;display:flex;gap:10px;align-items:center;justify-content:space-between}
-.nm{font-weight:600}.in{color:var(--mu);font-size:12.5px}
-.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
-.tag{background:var(--ac2);color:var(--ac);font-size:12px;padding:2px 9px;border-radius:99px}
-.warn{color:var(--wn);font-size:12px}
-.tag{border:0;font:inherit;font-size:12px;cursor:pointer}.tag.on{background:var(--ac);color:#fff}
-.bdg{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:99px;margin-left:6px;vertical-align:1px;background:var(--bg);border:1px solid var(--br);color:var(--mu)}.bdg.md{background:#fde8c8;border-color:#f0b765;color:#8a4b00}
-.bar{flex-wrap:wrap;display:flex;align-items:center;gap:8px;margin-bottom:10px}.bar label{margin:0;white-space:nowrap}.bar select{width:auto;min-width:140px}
-.act{display:flex;gap:4px;align-items:center;flex:none}
-.wa{background:var(--wa);color:#fff;border-radius:10px;padding:9px 13px;text-decoration:none;font-weight:600;white-space:nowrap}
-.ic{border:0;background:none;cursor:pointer;color:var(--mu);font-size:16px;padding:6px}
-.empty{text-align:center;color:var(--mu);padding:30px}
-.mod{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;padding:14px;z-index:9}
-.mod.o{display:flex}.box{background:var(--card);border-radius:16px;padding:16px;width:100%;max-width:520px;max-height:90vh;overflow:auto}
-.box h2{margin:0 0 10px;font-size:17px}label{display:block;font-size:12px;color:var(--mu);margin:10px 0 4px}
-.row{display:flex;gap:8px;margin-top:12px;justify-content:flex-end;flex-wrap:wrap}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pv{white-space:pre-wrap;background:var(--bg);border:1px dashed var(--br);border-radius:10px;padding:10px;font-size:13px}
-.msg{color:var(--mu);font-size:12.5px;margin-top:6px}
-@media(max-width:480px){.card{flex-direction:column;align-items:stretch}.act{justify-content:flex-end}}
-</style></head><body><div class="w">
-<div class="top"><div><h1 id="ttl">🎸 Cari Pelayan</h1><div class="sub" id="cnt"></div><div class="sub" id="src"></div></div>
-<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="b" onclick="op('mT')">✉️ Template</button><button class="b" onclick="op('mI')">⬆️ Upload / Unduh data</button></div></div>
-<div class="bar"><label>Pengirim (M2):</label><select id="sd" onchange="setS(this.value)"></select></div>
-<div class="bar"><label>Angkatan:</label><select id="fa" onchange="fA=this.value;draw()"></select><label>Kampus:</label><select id="fk" onchange="fK=this.value;draw()"></select></div>
-<input id="q" placeholder="Cari nama / prodi / gereja…" oninput="draw()">
-<div class="chips" id="chips"></div>
-<div class="sub" style="margin-top:-2px">Tips: klik tag pelayanan di kartu untuk memilih bentuk pelayanan yang dipakai di pesan.</div>
-<div id="list"><div class="empty">Memuat data…</div></div>
+.ctl{background:var(--paper);padding:2px 0 8px}
+@media(min-width:720px){.ctl{position:sticky;top:0;z-index:5;padding-top:8px;box-shadow:0 10px 12px -12px rgba(23,20,58,.25)}}
+.row1{align-items:flex-end;display:flex;gap:10px;flex-wrap:wrap}
+.sr{position:relative;flex:1 1 260px;height:46px;align-self:flex-end}
+.sr svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--mu)}
+.sr input{padding-left:40px;height:46px;font-size:15px;border-radius:14px;box-shadow:var(--sh)}
+.fl{display:flex;gap:8px;flex:1 1 260px}
+.fl label{margin:0;flex:1;display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--mu);font-weight:600}
+.fl select{width:100%;height:46px;color:var(--ink);font-weight:600;font-size:14px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);padding:8px 14px 8px 10px;border-radius:99px;cursor:pointer;white-space:nowrap;font-weight:600;font-size:14px;transition:background .15s,border-color .15s}
+.chip i{font-style:normal;font-size:16px;line-height:1}
+.chip small{font-size:12px;font-weight:700;color:var(--mu);background:var(--paper);border-radius:99px;padding:0 7px;min-width:22px;text-align:center}
+.chip:hover{border-color:var(--ac)}
+.chip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.chip.on small{background:#ffffff30;color:#fff}
+.hint{font-size:12.5px;color:var(--mu);margin:6px 2px 14px}
+.grid{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;grid-template-columns:auto 1fr;gap:12px 14px;box-shadow:var(--sh);position:relative}
+.card.md{border-color:#f0c26b;box-shadow:inset 4px 0 0 var(--amb),var(--sh);padding-left:18px}
+.av{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:16px;background:hsl(var(--h) 65% 90%);color:hsl(var(--h) 50% 26%)}
+@media(prefers-color-scheme:dark){.av{background:hsl(var(--h) 35% 24%);color:hsl(var(--h) 80% 84%)}}
+.bd{min-width:0}
+.nm{font-weight:700;font-size:16px;line-height:1.3;letter-spacing:-.01em}
+.pr{font-size:13px;color:var(--ink);opacity:.82;margin-top:1px}
+.gr{font-size:12.5px;color:var(--mu)}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pills:empty{display:none}
+.bdg{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--paper);border:1px solid var(--line);color:var(--mu)}
+.bdg.md{background:var(--amb-soft);border-color:#f0c26b;color:var(--amb-ink);font-weight:700}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tag{border:1px solid var(--line);background:var(--surface);font-size:12.5px;font-weight:600;padding:4px 11px;border-radius:99px;cursor:pointer;transition:background .15s}
+.tag:hover{border-color:var(--ac)}
+.tag.on{background:var(--ac-soft);border-color:var(--ac);color:var(--ac)}
+.for{font-size:12.5px;color:var(--mu);margin-top:8px}.for b{color:var(--ink);font-weight:700}
+.warn{color:var(--wn);font-size:12.5px;margin-top:8px}
+.act{grid-column:1/-1;display:flex;gap:8px}
+.wa{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--wa);color:#fff;text-decoration:none;font-weight:700;border-radius:12px;padding:11px 14px;transition:background .15s}
+.wa:hover{background:var(--wa-h)}
+.wa.off{background:var(--paper);color:var(--mu);border:1px dashed var(--line);font-weight:600}
+.cpb{flex:none;width:46px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:12px;cursor:pointer;color:var(--mu)}
+.cpb:hover{color:var(--ac);border-color:var(--ac)}
+.empty{grid-column:1/-1;text-align:center;color:var(--mu);padding:44px 16px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.empty b{color:var(--ink);font-size:16px}.empty .b{margin-top:10px}
+.src{text-align:center;color:var(--mu);font-size:12px;padding:22px 0 8px}
+.sub{color:var(--mu);font-size:13px}
+.b{border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:12px;cursor:pointer;font-weight:600}
+.b:hover{border-color:var(--ac)}
+.b.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.mod{position:fixed;inset:0;background:#0b0a2299;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.mod.o{display:flex}
+.box{background:var(--surface);border-radius:22px 22px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));width:100%;max-width:540px;max-height:92vh;overflow:auto;animation:up .22s ease-out}
+@media(min-width:600px){.mod{align-items:center;padding:16px}.box{border-radius:22px}}
+@keyframes up{from{transform:translateY(22px);opacity:0}}
+.box h2{margin:0 0 6px;font-size:19px;letter-spacing:-.015em}
+label{display:block;font-size:12px;color:var(--mu);margin:12px 0 5px;font-weight:600}
+.row{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.pv{white-space:pre-wrap;background:var(--paper);border:1px dashed var(--line);border-radius:12px;padding:12px;font-size:13px}
+.msg{color:var(--mu);font-size:12.5px;margin-top:8px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<header class="hero"><div class="in">
+<div class="hrow"><div><h1 id="ttl">Cari Pelayan</h1><p class="lead" id="cnt"></p></div>
+<div class="hbtn"><button class="hb" onclick="op('mT')">Template pesan</button><button class="hb" onclick="op('mI')">Data</button></div></div>
+<div class="send"><span>Kirim sebagai</span><select id="sd" onchange="setS(this.value)" aria-label="Pengirim"></select></div>
+</div></header>
+<main>
+<div class="ctl">
+<div class="row1">
+<div class="sr"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="Cari nama, prodi, atau gereja" oninput="draw()" aria-label="Cari"></div>
+<div class="fl"><label>Angkatan<select id="fa" onchange="fA=this.value;draw()"></select></label><label>Kampus<select id="fk" onchange="fK=this.value;draw()"></select></label></div>
 </div>
+<div class="chips" id="chips"></div>
+</div>
+<div class="hint">Klik tag pelayanan di kartu untuk memilih peran yang dipakai di pesan.</div>
+<div class="grid" id="list"><div class="empty">Memuat data…</div></div>
+<div class="src" id="src"></div>
+</main>
 
 <div class="mod" id="mT"><div class="box"><h2>Template pesan WA</h2>
 <div class="sub">Tersimpan di perangkat ini saja.</div>
@@ -61,11 +122,11 @@ textarea{resize:vertical;min-height:80px}
 <label>Contoh hasil</label><div class="pv" id="tV"></div>
 <div class="row"><button class="b" onclick="resetT()">Reset</button><button class="b" onclick="cl('mT')">Tutup</button><button class="b p" onclick="saveT()">Simpan</button></div></div></div>
 
-<div class="mod" id="mI"><div class="box"><h2>Upload / Unduh data</h2>
-<div class="sub">Upload file <b>.xlsx</b>/<b>.csv</b> (boleh pilih beberapa file sekaligus, mis. 3 angkatan) untuk <b>pratinjau</b> (hanya di perangkat ini, tidak mengubah data teman-teman). Untuk update permanen, unduh <b>data.js</b> lalu timpa file di folder website, atau update Google Sheets.</div>
+<div class="mod" id="mI"><div class="box"><h2>Data</h2>
+<div class="sub">Upload file <b>.xlsx</b>/<b>.csv</b> (boleh beberapa file sekaligus, mis. 3 angkatan) untuk <b>pratinjau</b> di perangkat ini saja. Untuk update permanen, unduh <b>data.js</b> lalu timpa file di folder website, atau update Google Sheets.</div>
 <label>Pilih file</label><input type="file" id="iF" multiple accept=".xlsx,.xls,.csv,.txt,.tsv">
 <div class="msg" id="iX"></div>
-<div class="row"><button class="b" onclick="dl('js')">⬇️ data.js</button><button class="b" onclick="dl('csv')">⬇️ CSV (untuk Sheets)</button><button class="b" onclick="cl('mI')">Tutup</button></div></div></div>
+<div class="row"><button class="b" onclick="dl('js')">Unduh data.js</button><button class="b" onclick="dl('csv')">Unduh CSV</button><button class="b p" onclick="cl('mI')">Tutup</button></div></div></div>
 
 <script>
 const CFG=Object.assign({SHEET_CSV_URL:'',JUDUL:'Cari Pelayan PMK',SENDER:'',PENGIRIM:null,KOMUNITAS:'',ACARA:'',HARI:'',JAM:''},window.CONFIG||{});
@@ -97,6 +158,11 @@ function merge(list){P=[];
   else P.push(o)})}
 const firstP=p=>p.pn||p.n.split(' ')[0];
 let pick={},fA='',fK='';
+const IC={WL:'🙌',Singer:'🎤',Gitaris:'🎸',Bass:'🎶',Drummer:'🥁',Cajon:'🪘',Keyboard:'🎹',Biola:'🎻',Tamborin:'🔔',Pemusik:'🎼',Multimedia:'🎬','Usher & Kolekte':'🤝','Sekolah Minggu':'🧒',Dancer:'💃',Semua:'✨'};
+const SV={wa:'<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z"/></svg>',cp:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>'};
+const hue=s=>{let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h};
+const ini=n=>n.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+function resetF(){sel='Semua';fA='';fK='';pick={};$('q').value='';filtUI();draw()}
 function filtUI(){const ys=[...new Set(P.map(p=>p.a).filter(Boolean))].sort().reverse();
  $('fa').innerHTML='<option value="">Semua</option>'+ys.map(y=>`<option${y===fA?' selected':''}>${esc(y)}</option>`).join('');
  $('fk').innerHTML=[['','Semua'],['solo','Solo'],['madiun','Madiun']].map(([v,t])=>`<option value="${v}"${v===fK?' selected':''}>${t}</option>`).join('')}
@@ -112,17 +178,17 @@ function draw(){
  base.forEach(p=>p.r.forEach(r=>m[r]=(m[r]||0)+1));
  const rs=Object.entries(m).sort((a,b)=>{const x=ORD.indexOf(a[0]),y=ORD.indexOf(b[0]);return(x<0?99:x)-(y<0?99:y)});
  if(sel!=='Semua'&&!m[sel])sel='Semua';
- $('chips').innerHTML=[['Semua',base.length],...rs].map(([r,c])=>`<button class="chip ${r===sel?'on':''}" data-r="${esc(r)}">${esc(r)}<small>${c}</small></button>`).join('');
+ $('chips').innerHTML=[['Semua',base.length],...rs].map(([r,c])=>`<button class="chip ${r===sel?'on':''}" data-r="${esc(r)}"><i>${IC[r]||'✨'}</i>${esc(r)}<small>${c}</small></button>`).join('');
  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{sel=b.dataset.r;pick={};draw()});
  const L=base.filter(p=>(sel==='Semua'||p.r.includes(sel))&&(!q||(p.n+' '+p.pr+' '+p.gr).toLowerCase().includes(q))).sort((a,b)=>a.n.localeCompare(b.n));
- $('cnt').textContent=L.length+' dari '+P.length+' orang';
+ $('cnt').innerHTML='Menampilkan <b>'+L.length+'</b> dari '+P.length+' orang';
  $('list').innerHTML=L.length?L.map(p=>{
-  const t=encodeURIComponent(msg(p,sel));let btn='';
-  if(p.w)btn=`<a class="wa" target="_blank" rel="noopener" href="https://wa.me/${p.w}?text=${t}">💬 WA</a>`;
-  else if(p.q)btn=`<a class="wa" target="_blank" rel="noopener" href="${esc(p.q)}">💬 Link WA</a>`;
-  else btn='<span class="warn">tanpa nomor</span>';
-  const note=p.q&&!p.w?'<div class="warn">Link QR (pesan tidak terisi otomatis) – pakai 📋</div>':(!p.v&&p.w?'<div class="warn">⚠ cek nomor</div>':'');
-  return `<div class="card"><div><div class="nm">${esc(p.n)}${p.a?`<span class="bdg">Angkatan ${esc(p.a)}</span>`:''}${p.md?'<span class="bdg md">📍 Kampus Madiun</span>':''}</div><div class="in">${esc([p.pr,p.gr].filter(Boolean).join(' · '))}</div><div class="tags">${p.r.map((r,i)=>`<button class="tag ${r===cur(p,sel)?'on':''}" onclick="pk('${p.id}',${i})">${esc(r)}</button>`).join('')}</div>${note}</div><div class="act">${btn}<button class="ic" title="Salin pesan" onclick="cp('${p.id}')">📋</button></div></div>`}).join(''):'<div class="empty">Tidak ada hasil.</div>'}
+  const rr=cur(p,sel),t=encodeURIComponent(msg(p,sel));let btn='';
+  if(p.w)btn=`<a class="wa" target="_blank" rel="noopener" href="https://wa.me/${p.w}?text=${t}">${SV.wa}Chat WA</a>`;
+  else if(p.q)btn=`<a class="wa" target="_blank" rel="noopener" href="${esc(p.q)}">${SV.wa}Buka link WA</a>`;
+  else btn='<span class="wa off">Tanpa nomor</span>';
+  const note=p.q&&!p.w?'<div class="warn">Hanya ada link QR, pesan tidak terisi otomatis. Pakai tombol salin.</div>':(!p.v&&p.w?'<div class="warn">Nomor kemungkinan salah, cek dulu.</div>':'');
+  return `<article class="card${p.md?' md':''}"><div class="av" style="--h:${hue(p.n)}">${esc(ini(p.n))}</div><div class="bd"><div class="nm">${esc(p.n)}</div>${p.pr?`<div class="pr">${esc(p.pr)}</div>`:''}${p.gr?`<div class="gr">${esc(p.gr)}</div>`:''}<div class="pills">${p.a?`<span class="bdg">Angkatan ${esc(p.a)}</span>`:''}${p.md?'<span class="bdg md">📍 Kampus Madiun</span>':''}</div>${p.r.length?`<div class="tags">${p.r.map((r,i)=>`<button class="tag ${r===rr?'on':''}" onclick="pk('${p.id}',${i})">${esc(r)}</button>`).join('')}</div><div class="for">Diajak sebagai <b>${esc(rr?(PH[rr]||rr.toLowerCase()):'pelayan')}</b></div>`:''}${note}</div><div class="act">${btn}<button class="cpb" title="Salin pesan" aria-label="Salin pesan untuk ${esc(p.n)}" onclick="cp('${p.id}')">${SV.cp}</button></div></article>`}).join(''):'<div class="empty"><b>Tidak ada yang cocok</b><span>Hapus filter atau ganti kata kunci.</span><button class="b" onclick="resetF()">Reset filter</button></div>'}
 function cp(id){const t=msg(P.find(x=>x.id===id),sel);if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert('Pesan disalin'),()=>prompt('Salin pesan:',t));else prompt('Salin pesan:',t)}
 function op(id){if(id==='mT'){tK.value=T.k;tA.value=T.a;tH.value=T.h;tJ.value=T.j;tB.value=T.b;pv()}$(id).classList.add('o')}
 function cl(id){$(id).classList.remove('o')}
@@ -161,7 +227,7 @@ function dl(kind){let txt,name,type;
  else{const q=s=>'"'+String(s).replace(/"/g,'""')+'"';txt='\ufeffNama,Panggilan,Prodi,Angkatan,Kampus,Gereja,Pelayanan,WA\n'+P.map(p=>[p.n,p.pn,p.pr,p.a,p.md?'Madiun':'Solo',p.gr,p.r.join(', '),p.w||p.q].map(q).join(',')).join('\n');name='database-pelayan.csv';type='text/csv'}
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click()}
 async function init(){
- $('ttl').textContent='🎸 '+CFG.JUDUL;document.title=CFG.JUDUL;
+ $('ttl').textContent=CFG.JUDUL;document.title=CFG.JUDUL;
  try{Object.assign(T,JSON.parse(localStorage.getItem('plv_t')||'{}'))}catch(e){}
  const L=Array.isArray(CFG.PENGIRIM)&&CFG.PENGIRIM.length?CFG.PENGIRIM:['Angelo','Mashudi','Tasya','Meyli','Gaby'];
  let sv0=null;try{sv0=localStorage.getItem('plv_s')}catch(e){}
